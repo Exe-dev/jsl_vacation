@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% load bootstrap %}
+{% load staticfiles %}
+
+{% block title %}休暇届の編集{% endblock title %}
+<head>
+    {% include "nav_head.html" %}
+</head>
+{% block extrahead %}
+{% include "nav_bar.html" %}
+    <link href="{% static 'css/vac_edit.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap-datepicker.css' %}" rel="stylesheet">
+    <script src="{% static 'js/vac_edit_types.js' %}"></script>
+    <script src="{% static 'js/vac_edit_alert.js' %}"></script>
+    <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-datepicker.ja.min.js' %}"></script>
+    <script type="text/javascript">
+        $(function () {
+          $('.date_cal').datepicker({
+            format : 'yyyy-mm-dd',
+              language: 'ja',
+              weekStart: 1
+          });
+        });
+    </script>
+    <script type="text/javascript">
+        $(function () {
+          calculateDays();
+        });
+        function calculateDays() {
+            var used_time = {{ vacation.used_time }};
+            $('#id_vacation_rest_time_day').val({{ vacation.used_days }} + Math.floor( used_time / 8 ));
+            $('#id_vacation_rest_time_day').val(Math.floor($('#id_vacation_rest_time').val() / 8));
+            $('#id_vacation_rest_time_hour').val($('#id_vacation_rest_time').val() % 8);
+        }
+    </script>
+{% endblock extrahead %}
+
+{% block content %}
+{% include "nav_bar.html" %}
+<ol class="breadcrumb" style="display: inline-block;">
+        <li><a href="{% url 'vac:vacation_menu' %}">メニュー</a></li>
+        <li><a href="{% url 'vac:vacation_list' %}">休暇一覧</a></li>
+        <li>{% if day_off_id %}休暇届修正{% else %}休暇届入力{% endif %}</li>
+    </ol>
+    <h3 class="page-header">休暇届入力</h3>
+    {% if day_off_id %}
+    <form action="{% url 'vac:day_off_edit' day_off_id=day_off.id %}" method="post" class="form-horizontal" role="form" name="day_off_edit" onsubmit="return chkForm()">
+        {% else %}
+        <form action="{% url 'vac:day_off_add' %}" method="post" class="form-horizontal" role="form" name="day_off_edit" onsubmit="return chkForm()">
+            {% endif %}
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-sm-offset-7 col-sm-5">
+                    <div class="vac_edit_form">
+                        <label class="control-label  " for="id_apply_day">届出日</label>
+                            <input type="text" name="apply_day" value="{{ day_off.apply_day }}" class="form-control edit_form_control" id="id_apply_day" disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-offset-2 col-sm-offset-2 col-md-5 col-sm-5">
+                    <div class="vac_edit_form">
+                        <label class="control-label  " for="id_user_section_name">所属</label>
+                            <input type="text" name="user_section_name" value="{{ day_off.user.section.name }}" class=" form-control edit_form_control" id="id_user_section_name" disabled>
+                    </div>
+                </div>
+                <div class="col-md-5 col-sm-5">
+                    <div class="vac_edit_form">
+                        <label class="control-label  " for="id_user_employee_id">社員ID</label>
+                            <input type="text" name="user_employee_id" value="{{ day_off.user.employee_id }}" class=" form-control edit_form_control" id="id_user_employee_id" style="width: 6em" disabled>
+                            <input type="text" name="user_employee_name" value="{{ day_off.user.employee_name }}" class=" form-control edit_form_control" id="id_user_employee_name" disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-12 ">
+                {{ form.day_off_type|bootstrap_horizontal }}
+            </div>
+            <div class="col-sm-12 col-md-12 ">
+                {{ form.reason_type|bootstrap_horizontal }}
+            </div>
+            <div class="col-sm-12 col-md-12 ">
+                {{ form.detail_type|bootstrap_horizontal }}
+            </div>
+
+                <div class="row">
+                    <div class="col-md-offset-1 col-sm-offset-1 col-md-1 col-sm-1">
+                        <label class="control-label " for="id_start_day">休暇日</label>
+                    </div>
+                    <div class="col-md-1 col-sm-1">
+                        <label class="control-label " for="id_start_day">日付</label>
+                    </div>
+                    <div class="col-md-3 col-sm-3">
+                            <input type="text" name="start_day" class=" form-control date_cal vac_edit_form" id="id_start_day" value="{{ day_off.start_day|default_if_none:""|date:"Y-m-d" }}">
+                    </div>
+                    <div class="col-md-1 col-sm-1">
+                        <label class="control-label " for="id_end_day">〜</label>
+                    </div>
+                    <div class="col-md-3 col-sm-3">
+                        <input type="text" name="end_day" class=" form-control date_cal vac_edit_form" id="id_end_day" value="{{ day_off.end_day|default_if_none:""|date:"Y-m-d" }}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-offset-2 col-sm-offset-2 col-sm-1 col-md-1">
+                        <label class="control-label" for="id_start_time">時間</label>
+                    </div>
+                    <div class="col-md-3 col-sm-3">
+                        {{ form.start_time|bootstrap_inline }}
+                    </div>
+                    <div class="col-sm-1 col-md-1">
+                        <label class="control-label" for="id_end_time">〜</label>
+                    </div>
+                    <div class="col-md-3 col-sm-3">
+                        {{ form.end_time|bootstrap_inline }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="vac_edit_form">
+                        <div class="col-md-2 col-sm-2">
+                            <label class="control-label " for="id_transfer_days">前年度繰越日数</label>
+                        </div>
+                        <div class="col-md-2 col-sm-2">
+                            <input type="text" name="vacation_transfer_days" value="{{ vacation.transfer_days}}" class="form-control edit_form_control_day" id="id_vacation_transfer_days" disabled><span>&nbsp;日</span>
+                        </div>
+                        <div class="col-md-2 col-sm-2">
+                            <label class="control-label " for="id_grant_days">本年度付与日数</label>
+                        </div>
+                        <div class="col-md-2 col-sm-2">
+                            <input type="text" name="vacation_grant_days" value="{{ vacation.grant_days }}" class="form-control edit_form_control_day" id="id_vacation_grant_days" disabled><span>&nbsp;日</span>
+                        </div>
+                        <div class="col-md-1 col-sm-1">
+                            <label class="control-label " for="id_total_days">合計日数</label>
+                        </div>
+                        <div class="col-md-2 col-sm-2">
+                            <input type="text" name="vacation_total_days" value="{{ vacation.total_days }}" class="form-control edit_form_control_day" id="id_vacation_total_days" disabled><span>&nbsp;日</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="vac_edit_form">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="control-label " for="id_used_days">本年度使用日数(本届けの有給を含まない)</label>
+                        </div>
+                        <div class="col-md-2 col-sm2">
+                            <input type="text" name="vacation_used_days" value="{{ vacation.used_days }}" class="form-control edit_form_control_day" id="id_vacation_used_days" disabled><span>&nbsp;日</span>
+                        </div>
+                        <div class="col-md-1 col-sm-1">
+                            <label class="control-label " for="id_rest_days">残日数</label>
+                        </div>
+                        <div class="col-md-2 col-sm-2">
+                            <input type="text" name="vacation_rest_days" class="form-control edit_form_control_day" id="id_vacation_rest_days" value="{{ vacation.rest_days }}" disabled><span>&nbsp;日</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="vac_edit_form">
+                        <div class="col-md-4 col-sm-4">
+                            <label class="control-label " for="id_used_days">うち時間単位で取得可能日数／時間</label>
+                        </div>
+                        <div class="col-md-2 col-sm-2">
+                            <input type="text" name="vacation_rest_time_day" value="4" class="form-control edit_form_control_day" id="id_vacation_rest_time_day" disabled><span>&nbsp;日</span>
+                        </div>
+                        <div class="col-md-2 col-sm-2">
+                            <input type="text" name="vacation_rest_time_hour" value="1.5" class="form-control edit_form_control_day" id="id_vacation_rest_time_hour" disabled><span>&nbsp;時間</span>
+                        </div>
+                        <div class="col-md-1 col-sm-1">
+                            <label class="control-label " for="id_rest_time">残時間</label>
+                        </div>
+                        <div class="col-md-2 col-sm-2">
+                            <input type="text" name="vacation_rest_time" value="{{ vacation.rest_time }}" class="form-control edit_form_control_day" id="id_vacation_rest_time" disabled><span style="white-space: nowrap">&nbsp;時間</span>
+                        </div>
+                    </div>
+                </div>
+
+
+            <div class="form-group">
+            <div class="col-sm-offset-11 col-sm-1">
+                <button type="submit" class="btn btn-primary">申請</button>
+            </div>
+            </div>
+        </form>
+        <a href="{% url 'vac:vacation_list' %}" class="btn btn-default btn-sm">一覧に戻る</a>
+{% endblock content %}

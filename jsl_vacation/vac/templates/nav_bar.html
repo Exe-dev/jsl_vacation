@@ -1,0 +1,41 @@
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#gnavi">
+                <span class="sr-only">メニュー</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div id="gnavi" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav navbar-right">
+                {% if request.user.is_staff %}
+                    <li>
+                        {% if user.id != request.user.id %}
+                            <a href="#" style="pointer-events: none;">
+                                [ {{ user.last_name }}{{ user.first_name }} ]表示中
+                            </a>
+                        {% endif %}
+                    </li>
+                {% endif %}
+                <li id="home">
+                    <a id="home_confirm" href="{% url 'vac:vacation_menu' %} ">メニュー</a>
+                </li>
+                <li>
+                    <a href="{% url 'vac:vacation_list' %}">休暇一覧</a>
+                </li>
+                <li>
+                    <a href="{% url 'vac:day_off_add' %}">新規申請</a>
+                </li>
+                <li>
+                    <a href="#" style="pointer-events: none;">
+                        {{ request.user }}でログイン中</a>
+                </li>
+                <li id="login">
+                    <a id="logout_confirm" href="{% url 'vac:logout' %}">ログアウト</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

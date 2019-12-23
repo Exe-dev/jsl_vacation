@@ -1,0 +1,19 @@
+.vac_edit_form{
+    margin-bottom: 15px;
+    margin-right: 15px;
+}
+
+.edit_form_control{
+    display: inline-block;
+    width: 12em;
+}
+
+.edit_form_control_day{
+    display: inline-block;
+    width: 3em;
+}
+
+label{
+    white-space: nowrap;
+    text-align: right;
+}
