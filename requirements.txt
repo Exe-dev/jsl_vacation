@@ -1,6 +1,6 @@
 Django==2.2.24
 django-bootstrap-form==3.3
 pytz==2017.2
-djangorestframework==3.6.4
+djangorestframework==3.11.2
 factory-boy==2.9.2
 
